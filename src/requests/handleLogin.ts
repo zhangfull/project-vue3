@@ -51,11 +51,32 @@ export const handleActiveLogin = async (emailOrUid: string, password: string): P
     }
 };
 
-export const handleAutoLogin = async (): Promise<boolean> => {
+export const handleRefreshLogin = async (): Promise<boolean> => {
     console.log('execute: handleLogin()');
     try {
         const response = await axiosInstance.post(
-            '/api/login/refresh', {}, { withCredentials: true }
+            '/api/login/refresh'
+        )
+        console.log("后端返回的信息码：", response.data.code)
+        console.log("后端返回的数据：", response.data.data)
+        const success = response.data.code === 0
+        if (success) {
+            const data: LoginResponseData = response.data.data
+            await useLoginStore().setUser(data)
+        }
+        console.log('handleRegister() execute completed');
+        return success
+    } catch (error) {
+        console.error('请求失败:', error)
+        throw error;
+    }
+};
+
+export const handleInitializeLogin = async (): Promise<boolean> => {
+    console.log('execute: handleLogin()');
+    try {
+        const response = await axiosInstance.post(
+            '/api/login/initialize', {}, { withCredentials: true }
         )
         console.log("后端返回的信息码：", response.data.code)
         console.log("后端返回的数据：", response.data.data)
@@ -72,7 +93,13 @@ export const handleAutoLogin = async (): Promise<boolean> => {
         console.error('请求失败:', error)
         throw error;
     }
-};
+}
+
+export const test = async () => {
+    const response = await axiosInstance.post(
+            '/api/login/test'
+        )
+}
 
 
 

@@ -1,8 +1,9 @@
 // stores/user.ts
 
 import { handleGetAvatar } from "@/requests/handleImg"
-import { handleAutoLogin } from "@/requests/handleLogin"
+import { handleInitializeLogin, handleRefreshLogin } from "@/requests/handleLogin"
 import type { LoginResponseData } from "@/types"
+import { openErrorNotice } from "@/utils/noticeUtils"
 import { defineStore } from "pinia"
 
 
@@ -42,7 +43,15 @@ export const useLoginStore = defineStore('user', {
             }
         },
         async refreshLogin() {
-            return await handleAutoLogin();
+            const login = await handleRefreshLogin();
+            if (!login) {
+                if (await handleInitializeLogin()) {
+                    openErrorNotice('登陆信息过期，请刷新界面')
+                } else {
+                    openErrorNotice('登陆信息过期，请重新登陆')
+                }
+            }
+            return 
         }
     }
 })

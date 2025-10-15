@@ -4,9 +4,10 @@ import { onMounted, ref, watch } from 'vue';
 import { file_form_rules } from '@/utils/validateRules';
 import { ElMessage, type UploadFile } from 'element-plus';
 import { Plus } from '@element-plus/icons-vue'
-import { handleGetFileCategories } from '@/requests/fileCategory';
+import { handleGetFileCategories } from '@/requests/handleFileCategory';
 import { updated } from '@/requests/handleFile';
-import UploadProgress from '@/components/layout/UploadProgress.vue';
+import UploadProgress from '@/components/dialog/UploadProgress.vue';
+import { openErrorNotice } from '@/utils/noticeUtils';
 
 
 const form = ref<FileInfoForm>({
@@ -122,7 +123,16 @@ const percentage = ref(0)
 async function submitForm() {
     //start.value = true
     const files = imgs.value.map(img => img.raw).filter(Boolean) as File[]
-    updated(uploadInfo, percentage, fileList.value[0] || null, form.value, files.length > 0 ? files : null)
+    updated(uploadInfo, percentage, fileList.value[0] || null, form.value, files.length > 0 ? files : null).then(res => {
+        if (!res) {
+            start.value = false
+            return
+        }
+    }).catch(() => {
+        start.value = false
+    }).finally(() => {
+        start.value = false
+    })
 }
 
 function cancel() {

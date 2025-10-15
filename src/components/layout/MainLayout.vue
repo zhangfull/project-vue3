@@ -3,8 +3,6 @@ import { useLoginStore } from '@/stores/loginStore';
 import { onMounted, ref, watch } from 'vue';
 import LoginModal from '@/components/dialog/LoginModal.vue';
 
-const notice = ref<string | boolean>(false)
-const userName = ref('')
 const avatarBase64 = ref('')
 const loginStore = useLoginStore()
 
@@ -22,19 +20,14 @@ function handleLoginSuccess() {
 watch(
   () => loginStore.avatarBase64,
   () => {
+    console.log("用户头像信息实时更改")
     avatarBase64.value = loginStore.avatarBase64
   }
 );
 
-onMounted(async () => {
-  const success = await loginStore.refreshLogin()
-  if (success) {
-    avatarBase64.value = loginStore.avatarBase64
-    console.log("用户已登录" )
-    return
-  }
-  console.log("用户未登录")
-});
+onMounted(() => {
+  avatarBase64.value = loginStore.avatarBase64
+})
 
 </script>
 

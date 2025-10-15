@@ -40,7 +40,9 @@ axiosInstance.interceptors.response.use(
     // 响应错误处理
     console.error("响应拦截器错误:", error)
     if (error.response.status === 401) {
-      openErrorNotice("未登录");
+      //openErrorNotice("未登录");
+      console.log('登陆验证失败');
+      
     }
     if (error.response.status === 403) {
       openErrorNotice("没有权限");

@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
 import { useLoginStore } from '@/stores/loginStore';
+import { handleInitializeLogin } from './requests/handleLogin';
 
 const loginStore = useLoginStore()
 let timer: number | undefined
 
-onMounted(() => {
+onMounted(async () => {
 
+  await handleInitializeLogin()
   // 每隔 8分钟 执行一次
   timer = window.setInterval(() => {
     console.log("刷新登录认证", new Date().toLocaleTimeString())
     loginStore.refreshLogin()
   }, 1000 * 60 * 8)
-
 })
 
 onUnmounted(() => {

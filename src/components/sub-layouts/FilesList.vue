@@ -4,7 +4,7 @@ import { onMounted, reactive, ref, watch } from 'vue';
 import { Loading } from '@element-plus/icons-vue'
 import type { Category, FileListItem, FilePage, FilesRequestConditions, FilterFilesConditions } from '@/types';
 import { handleIsSearch, handlePageAcquisition } from '@/requests/handleFile';
-import { handleGetFileCategories } from '@/requests/fileCategory';
+import { handleGetFileCategories } from '@/requests/handleFileCategory';
 
 
 const version = ref(0)
