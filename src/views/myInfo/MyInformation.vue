@@ -5,6 +5,7 @@ import { onMounted, ref } from 'vue';
 import { useLoginStore } from '@/stores/loginStore';
 import ShowMyInfo from '@/components/sub-layouts/ShowMyInfo.vue';
 import EditMyInfo from '@/components/sub-layouts/EditMyInfo.vue';
+import { openErrorNotice } from '@/utils/noticeUtils';
 const loginStore = useLoginStore()
 
 const personalInfo = ref<UserInfoResponseData | null>(null);
@@ -12,15 +13,20 @@ const showMyInfo = ref(true);
 function turnShowAndEdit() {
     showMyInfo.value = !showMyInfo.value;
 }
-
 onMounted(async () => {
-    personalInfo.value = await handleGetUserInfo()
-    if (!personalInfo.value) {
-        return
-    }
-    loginStore.avatarUrl = personalInfo.value.avatarUrl
-    loginStore.refreshAvatarBase64();
-    console.log('个人信息界面加载完成')
+    handleGetUserInfo().then((res) => {
+        personalInfo.value = res
+        if (!personalInfo.value) {
+            throw new Error('个人信息为空')
+        }
+        loginStore.avatarUrl = personalInfo.value.avatarUrl
+        loginStore.refreshAvatarBase64();
+        console.log('个人信息界面加载完成')
+    }).catch((err) => {
+        console.log('个人信息界面加载失败')
+        openErrorNotice('个人信息加载失败，请刷新页面')
+    })
+
 });
 </script>
 

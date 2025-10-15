@@ -6,11 +6,13 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits<{
-    (e: 'cancel'): void
+    (e: 'cancel'): void,
+    (e: 'success'): void
 }>()
 
 watch(() => props.percentage, () => {
     getColorByPercentage(props.percentage)
+
 })
 
 function getColorByPercentage(percentage: number) {
@@ -33,7 +35,7 @@ function getColorByPercentage(percentage: number) {
 </script>
 
 <template>
-    <main class="notice-container">
+    <div class="notice-container">
         <section class="notice-content">
             <div class="header">
                 <h2 class="title">
@@ -53,12 +55,16 @@ function getColorByPercentage(percentage: number) {
 
             <div v-if="percentage < 100" class="actions">
                 <el-button type="danger" size="medium" @click="emits('cancel')" plain class="cancel-btn">
-                    <i class="el-icon-close"></i>
                     取消上传
                 </el-button>
             </div>
+            <div v-else class="actions">
+                <el-button type="success" size="medium" @click="emits('success')" plain class="cancel-btn">
+                    上传成功
+                </el-button>
+            </div>
         </section>
-    </main>
+    </div>
 </template>
 
 <style scoped>

@@ -83,7 +83,7 @@ export interface FileInfoForm {
   display: boolean
 }
 
-export interface UploadUrls {
-  fileUrl: string
-  imgsUrl: string
+export interface UploadPaths {
+  filePath: string
+  imgsPath: string
 }

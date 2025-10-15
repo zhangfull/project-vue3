@@ -7,7 +7,7 @@ import { Plus } from '@element-plus/icons-vue'
 import { handleGetFileCategories } from '@/requests/handleFileCategory';
 import { updated } from '@/requests/handleFile';
 import UploadProgress from '@/components/dialog/UploadProgress.vue';
-import { openErrorNotice } from '@/utils/noticeUtils';
+import { openErrorNotice, openSuccessNotice } from '@/utils/noticeUtils';
 
 
 const form = ref<FileInfoForm>({
@@ -121,22 +121,27 @@ const start = ref(false)
 const percentage = ref(0)
 
 async function submitForm() {
-    //start.value = true
-    const files = imgs.value.map(img => img.raw).filter(Boolean) as File[]
-    updated(uploadInfo, percentage, fileList.value[0] || null, form.value, files.length > 0 ? files : null).then(res => {
+    start.value = true
+    const imgList = imgs.value.map(img => img.raw).filter(Boolean) as File[]
+    updated(uploadInfo, percentage, fileList.value[0] || null, form.value, imgList.length > 0 ? imgList : null).then(res => {
         if (!res) {
-            start.value = false
-            return
+            openErrorNotice('上传失败')
+        } else {
+            openSuccessNotice('上传成功')
+            //resetForm()
         }
+        return
     }).catch(() => {
-        start.value = false
-    }).finally(() => {
-        start.value = false
+        openErrorNotice('上传失败')
     })
 }
 
 function cancel() {
     //cancel upload
+    start.value = false
+}
+
+function success() {
     start.value = false
 }
 
@@ -151,6 +156,7 @@ onMounted(async () => {
     <main>
         <header>
             <h1>上传文件</h1>
+
         </header>
         <section class="upload-file-container">
             <el-upload ref="uploadRef" drag action="#" multiple :auto-upload="false" :on-change="handleChangeFile"
@@ -220,12 +226,10 @@ onMounted(async () => {
             <el-button type="danger" style="width: 100px;" @click="resetForm()" plain>重置</el-button>
             <el-button type="primary" style="width: 100px;" @click="submitForm()" plain>提交</el-button>
         </footer>
-
-        <UploadProgress v-if="start" :percentage="percentage" @cancel="cancel">
-            {{ uploadInfo }}
-        </UploadProgress>
     </main>
-
+    <UploadProgress v-if="start" :percentage="percentage" @cancel="cancel" @success="success">
+        {{ uploadInfo }}
+    </UploadProgress>
 </template>
 
 <style scoped>

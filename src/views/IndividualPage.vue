@@ -33,6 +33,7 @@ const activeIndex = computed(() => {
     if (route.path.includes('/browsing-history')) return '5'
     return '1'
 })
+
 </script>
 
 <template>

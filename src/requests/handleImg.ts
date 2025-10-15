@@ -12,7 +12,7 @@ export const handleGetAvatar = async (url: string): Promise<string> => {
         console.log('handleGetAvatar() execute completed');
         
         if (response.data.code === 0) {
-            return "data:image/png;base64," + response.data.data
+            return response.data.data
         } else {
             openErrorNotice('头像加载失败')
             return ''

@@ -28,7 +28,6 @@ watch(
 onMounted(() => {
   avatarBase64.value = loginStore.avatarBase64
 })
-
 </script>
 
 <template>

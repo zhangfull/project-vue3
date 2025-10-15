@@ -88,10 +88,7 @@ function uploadCutFile() {
     setTimeout(async () => {                    //已经读取完成，给图片加载时间0.1s
       const result = await handleSetAvatar(file);
       if (result) {
-        openSuccessNotice('上传成功！');
         loginStore.avatarBase64 = URL.createObjectURL(file)
-      } else {
-        openErrorNotice("上传失败！")
       }
       isUploading.value = false
       
