@@ -84,11 +84,13 @@ export interface FileInfoForm {
 }
 
 export interface UploadPaths {
+    id: number
     filePath: string
     imgsPath: string
 }
 
 export interface ValidateForm  {
+    id: number,
     filePath: string,
     imgsPath: string,
     totalNumber: number,

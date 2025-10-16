@@ -10,7 +10,7 @@ export const handleGetAvatar = async (url: string): Promise<string> => {
         )
         console.log("后端返回的信息码：", response.data.code)              //调试
         console.log('handleGetAvatar() execute completed');
-        
+
         if (response.data.code === 0) {
             return response.data.data
         } else {
@@ -43,7 +43,7 @@ export const handleSetAvatar = async (file: File): Promise<boolean> => {
 };
 
 
-export const uploadFileImgs = async (filePath: string, imgs: File[]): Promise<boolean> => {
+export const uploadFileImgs = async (filePath: string, imgs: File[], id: number): Promise<boolean> => {
     console.log('execute: uploadImgs()');
     const form = new FormData();
     // 遍历文件数组，为每个文件单独添加到FormData
@@ -51,6 +51,7 @@ export const uploadFileImgs = async (filePath: string, imgs: File[]): Promise<bo
         form.append('imgs', img);
     });
     form.append('filePath', filePath);
+    form.append('id', id.toString());
     try {
         const response = await axiosInstance.post('/api/file/uploadImgs',
             form,

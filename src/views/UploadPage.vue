@@ -123,22 +123,26 @@ const percentage = ref(0)
 async function submitForm() {
     start.value = true
     const imgList = imgs.value.map(img => img.raw).filter(Boolean) as File[]
-    updated(uploadInfo, percentage, fileList.value[0] || null, form.value, imgList.length > 0 ? imgList : null).then(res => {
-        if (!res) {
-            openErrorNotice('上传失败')
+    updated(uploadInfo,
+        percentage,
+        fileList.value[0] || null,
+        form.value,
+        imgList.length > 0 ? imgList : null).then(res => {
+            if (!res) {
+                openErrorNotice('上传失败')
+                percentage.value = 0
+                uploadInfo.value = '上传失败'
+            } else {
+                openSuccessNotice('上传成功')
+                resetForm()
+            }
+            return
+        }).catch(() => {
             percentage.value = 0
             uploadInfo.value = '上传失败'
-        } else {
-            openSuccessNotice('上传成功')
-            resetForm()
-        }
-        return
-    }).catch(() => {
-        percentage.value = 0
-        uploadInfo.value = '上传失败'
-        openErrorNotice('上传失败')
-        return
-    })
+            openErrorNotice('上传失败')
+            return
+        })
 }
 
 function cancel() {

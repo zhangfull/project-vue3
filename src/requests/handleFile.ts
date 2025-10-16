@@ -118,30 +118,33 @@ export const updated = async (
 
         // 上传文件块
         const formData = new FormData();
-        formData.append('uploadUrl', urls.filePath);                // Blob
+        formData.append('uploadUrl', urls.filePath);                 // Blob
         formData.append('chunkIndex', String(currentChunkIndex));    // 当前块号
         formData.append('chunkTotal', String(totalChunks));          // 总块数
-        formData.append('chunkBLOB', chunk);         // 文件名
+        formData.append('chunkBLOB', chunk);                         // 文件块
 
         const uploadResult = await uploadFile(formData)
         if (!uploadResult) {
             reupload += 1
             if (reupload > 3) {
                 console.log('updated() execute completed chunk upload failed');
+                deleteGarbage(urls.id)
                 return false
             }
         } else {
             currentChunkIndex += 1
         }
     }
+    
 
     // third step upload imgs
     if (imgs !== null) {
         percentage.value = uploadFormWeightPercentage + uploadFileWeightPercentage
         uploadProgress.value = '正在上传图片...'
-        const uploadImgsResult = await uploadFileImgs(urls.imgsPath, imgs)
+        const uploadImgsResult = await uploadFileImgs(urls.imgsPath, imgs, urls.id)
         if (!uploadImgsResult) {
             console.log('updated() execute completed imgs upload failed');
+            deleteGarbage(urls.id)
             return false
         }
         percentage.value = uploadFormWeightPercentage + uploadFileWeightPercentage + uploadImgsWeightPercentage
@@ -151,6 +154,7 @@ export const updated = async (
     // fourth step merge file
     uploadProgress.value = '验证信息中...'
     const validateForm: ValidateForm = {
+        id: urls.id,
         filePath: urls.filePath,
         imgsPath: urls.imgsPath,
         totalNumber: totalChunks,
@@ -178,14 +182,14 @@ const updateForm = async (form: FileInfoForm): Promise<UploadPaths | null> => {
         const response = await axiosInstance.post('/api/file/uploadForm',
             form
         )
-        console.log("后端返回的信息码：", response.data.code)              //调试
+        console.log("后端返回的信息码：", response.data.code)                  //调试
 
         console.log('updateForm() execute completed');
         if (response.data.code === 0) {
             console.log("后端返回的数据：", response.data.data)                //调试
             return response.data.data
         } else {
-            console.log("后端返回的数据：", response.data.message)                //调试
+            console.log("后端返回的数据：", response.data.message)             //调试
             return null;
         }
     } catch (error) {
@@ -223,6 +227,21 @@ const validate = async (form: ValidateForm): Promise<boolean> => {
         const response = await axiosInstance.post('/api/file/validate',
             form)
         console.log('mergeFile() execute completed');
+        console.log("后端返回的信息码：", response.data.code)              //调试
+        return response.data.code === 0
+    } catch (error) {
+        console.error('获取资源数据失败:', error)
+        throw error;
+    }
+}
+
+// 5.delete garbage
+const deleteGarbage = async (id: number): Promise<boolean> => {
+    console.log('execute: deleteGarbage()');
+    try {
+        const response = await axiosInstance.post('/api/file/deleteGarbage',
+            { id })
+        console.log('deleteGarbage() execute completed');
         console.log("后端返回的信息码：", response.data.code)              //调试
         return response.data.code === 0
     } catch (error) {
