@@ -74,16 +74,23 @@ export interface Category {
 
 // upload modules
 export interface FileInfoForm {
-  headline: string
-  categoryCode: number | 1
-  fileName: string
-  size: string
-  description: string
-  introduce: string
-  display: boolean
+    headline: string
+    categoryCode: number | 1
+    fileName: string
+    size: string
+    description: string
+    introduce: string
+    display: boolean
 }
 
 export interface UploadPaths {
-  filePath: string
-  imgsPath: string
+    filePath: string
+    imgsPath: string
+}
+
+export interface ValidateForm  {
+    filePath: string,
+    imgsPath: string,
+    totalNumber: number,
+    totalImgs: number
 }

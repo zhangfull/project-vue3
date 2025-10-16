@@ -10,10 +10,13 @@ const emits = defineEmits<{
     (e: 'success'): void
 }>()
 
+const percentageString = ref('0')
 watch(() => props.percentage, () => {
-    getColorByPercentage(props.percentage)
-
-})
+    getColorByPercentage(props.percentage)    
+    percentageString.value = props.percentage.toFixed(0)
+}), {
+    deep: true
+}
 
 function getColorByPercentage(percentage: number) {
     const colors = [
@@ -41,7 +44,7 @@ function getColorByPercentage(percentage: number) {
                 <h2 class="title">
                     文件上传中
                 </h2>
-                <div class="percentage">{{ props.percentage }}%</div>
+                <div class="percentage">{{ percentageString }}%</div>
             </div>
 
             <div class="slot-content">
@@ -54,12 +57,12 @@ function getColorByPercentage(percentage: number) {
             </div>
 
             <div v-if="percentage < 100" class="actions">
-                <el-button type="danger" size="medium" @click="emits('cancel')" plain class="cancel-btn">
+                <el-button type="danger" @click="emits('cancel')" plain class="cancel-btn">
                     取消上传
                 </el-button>
             </div>
             <div v-else class="actions">
-                <el-button type="success" size="medium" @click="emits('success')" plain class="cancel-btn">
+                <el-button type="success" @click="emits('success')" plain class="cancel-btn">
                     上传成功
                 </el-button>
             </div>

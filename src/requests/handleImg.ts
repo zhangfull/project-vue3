@@ -41,3 +41,30 @@ export const handleSetAvatar = async (file: File): Promise<boolean> => {
         throw error;
     }
 };
+
+
+export const uploadFileImgs = async (filePath: string, imgs: File[]): Promise<boolean> => {
+    console.log('execute: uploadImgs()');
+    const form = new FormData();
+    // 遍历文件数组，为每个文件单独添加到FormData
+    imgs.forEach((img, index) => {
+        form.append('imgs', img);
+    });
+    form.append('filePath', filePath);
+    try {
+        const response = await axiosInstance.post('/api/file/uploadImgs',
+            form,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
+        )
+        console.log('uploadImgs() execute completed');
+        console.log("后端返回的信息码：", response.data.code)              //调试
+        return response.data.code === 0
+    } catch (error) {
+        console.error('获取资源数据失败:', error)
+        throw error;
+    }
+}

@@ -1,7 +1,8 @@
-import { type FileInfoForm, type FileListItem, type FilePage, type FilesRequestConditions, type FilterFilesConditions, type UploadPaths } from "@/types";
+import { type FileInfoForm, type FileListItem, type FilePage, type FilesRequestConditions, type FilterFilesConditions, type UploadPaths, type ValidateForm } from "@/types";
 import axiosInstance from "./axiosInstance";
 import { createLoading, openErrorNotice } from "@/utils/noticeUtils";
 import { ref, type Ref } from "vue";
+import { uploadFileImgs } from "./handleImg";
 
 // 判断是否为搜索
 export const handleIsSearch = (condition: FilterFilesConditions): boolean => {
@@ -69,6 +70,19 @@ export const updated = async (
         return false
     }
 
+    // 分块
+    const chunkSize = 4 * 1024 * 1024 // 每块4MB
+    const totalChunks = Math.ceil(file.size / chunkSize)
+    if (totalChunks > 125) {
+        openErrorNotice('文件过大')
+        return false
+    }
+
+    if (imgs && imgs.length > 6) {
+        openErrorNotice('图片过多')
+        return false
+    }
+
     // first steep upload form
     console.log('execute: updated()');
     uploadProgress.value = '正在初始化仓库...'
@@ -83,16 +97,14 @@ export const updated = async (
 
     uploadProgress.value = '正在上传文件(0/0)...'
     console.log("开始上传块...")
-    const chunkSize = 4 * 1024 * 1024 // 每块4MB
-    const totalChunks = Math.ceil(file.size / chunkSize)
     let reupload = 0
     const realFile: File = (file as any).raw instanceof File ? (file as any).raw : file;
 
     percentage.value = 10
 
     const uploadFormWeightPercentage = 10;      // 上传form占总进度的10%
-    const uploadFileWeightPercentage = 80;      // 上传文件占总进度的80%
-    const uploadCheckoutWeightPercentage = 10;  // 上传检验占总进度的10%
+    const uploadFileWeightPercentage = 50;      // 上传文件占总进度的50%
+    const uploadImgsWeightPercentage = 30;      // 上传图片占总进度的30%
 
     for (let currentChunkIndex = 0; currentChunkIndex < totalChunks;) {
         // 获取当前要上传的块
@@ -123,16 +135,35 @@ export const updated = async (
         }
     }
 
-    // third step merge file
-    uploadProgress.value = '整理信息中...'
-    const mergeResult = await mergeFile(form.fileName, totalChunks, urls.filePath)
-    if (mergeResult) {
+    // third step upload imgs
+    if (imgs !== null) {
+        percentage.value = uploadFormWeightPercentage + uploadFileWeightPercentage
+        uploadProgress.value = '正在上传图片...'
+        const uploadImgsResult = await uploadFileImgs(urls.imgsPath, imgs)
+        if (!uploadImgsResult) {
+            console.log('updated() execute completed imgs upload failed');
+            return false
+        }
+        percentage.value = uploadFormWeightPercentage + uploadFileWeightPercentage + uploadImgsWeightPercentage
+    }
+
+
+    // fourth step merge file
+    uploadProgress.value = '验证信息中...'
+    const validateForm: ValidateForm = {
+        filePath: urls.filePath,
+        imgsPath: urls.imgsPath,
+        totalNumber: totalChunks,
+        totalImgs: imgs ? imgs.length : 0
+    }
+    const validateResult = await validate(validateForm)
+    if (validateResult) {
         uploadProgress.value = '文件上传成功'
         percentage.value = 100
     } else {
         return false
     }
-    
+
     console.log('updated() execute completed');
     return true
 
@@ -149,7 +180,6 @@ const updateForm = async (form: FileInfoForm): Promise<UploadPaths | null> => {
         )
         console.log("后端返回的信息码：", response.data.code)              //调试
 
-        console.log('');
         console.log('updateForm() execute completed');
         if (response.data.code === 0) {
             console.log("后端返回的数据：", response.data.data)                //调试
@@ -169,7 +199,12 @@ const uploadFile = async (data: FormData): Promise<boolean> => {
     console.log('execute: uploadFile()');
     try {
         const response = await axiosInstance.post('/api/file/uploadChunk',
-            data
+            data,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
         )
         console.log('uploadFile() execute completed');
         console.log("后端返回的信息码：", response.data.code)              //调试
@@ -180,16 +215,13 @@ const uploadFile = async (data: FormData): Promise<boolean> => {
     }
 }
 
-// 3.merge file
-const mergeFile = async (fileName: string, totalNumber: number, path: string): Promise<boolean> => {
+
+// 4.validate file
+const validate = async (form: ValidateForm): Promise<boolean> => {
     console.log('execute: mergeFile()');
     try {
-        const response = await axiosInstance.post('/api/file/mergeChunks',
-            {
-                fileName: fileName,
-                totalNumber: totalNumber,
-                path: path
-            })
+        const response = await axiosInstance.post('/api/file/validate',
+            form)
         console.log('mergeFile() execute completed');
         console.log("后端返回的信息码：", response.data.code)              //调试
         return response.data.code === 0
@@ -198,5 +230,3 @@ const mergeFile = async (fileName: string, totalNumber: number, path: string): P
         throw error;
     }
 }
-
-// 4.upload imgs

@@ -126,13 +126,18 @@ async function submitForm() {
     updated(uploadInfo, percentage, fileList.value[0] || null, form.value, imgList.length > 0 ? imgList : null).then(res => {
         if (!res) {
             openErrorNotice('上传失败')
+            percentage.value = 0
+            uploadInfo.value = '上传失败'
         } else {
             openSuccessNotice('上传成功')
-            //resetForm()
+            resetForm()
         }
         return
     }).catch(() => {
+        percentage.value = 0
+        uploadInfo.value = '上传失败'
         openErrorNotice('上传失败')
+        return
     })
 }
 
@@ -224,7 +229,9 @@ onMounted(async () => {
         </section>
         <footer class="form-buttons" v-if="fileReady">
             <el-button type="danger" style="width: 100px;" @click="resetForm()" plain>重置</el-button>
-            <el-button type="primary" style="width: 100px;" @click="submitForm()" plain>提交</el-button>
+            <el-button type="primary" style="width: 100px;" @click="submitForm()" plain>
+                提交
+            </el-button>
         </footer>
     </main>
     <UploadProgress v-if="start" :percentage="percentage" @cancel="cancel" @success="success">
