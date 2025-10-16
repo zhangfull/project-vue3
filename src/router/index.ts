@@ -32,9 +32,9 @@ const routes: Array<RouteRecordRaw> = [
         path: '/display',
         name: 'display',
         component: () => import('@/components/layout/DisplayLayout.vue'),
-        // children: [
-        //     { path: 'detail/:id', name: 'FileDetail', component: () => import('@/views/file/FileDetailPage.vue') },
-        // ]
+        children: [
+            { path: 'detail/:id', name: 'FileDetail', component: () => import('@/views/file/FileDetailPage.vue') },
+        ]
     }
 ];
 

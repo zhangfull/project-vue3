@@ -61,7 +61,9 @@ export interface FileListItem {
 export interface DetailFile extends FileListItem {
     fileName: string
     size: string
+    uploaderId: number
     uploader: string
+    filePath: string
     introduce: string
     imgs: string[]
 }

@@ -1,4 +1,4 @@
-import { type FileInfoForm, type FileListItem, type FilePage, type FilesRequestConditions, type FilterFilesConditions, type UploadPaths, type ValidateForm } from "@/types";
+import { type DetailFile, type FileInfoForm, type FileListItem, type FilePage, type FilesRequestConditions, type FilterFilesConditions, type UploadPaths, type ValidateForm } from "@/types";
 import axiosInstance from "./axiosInstance";
 import { createLoading, openErrorNotice } from "@/utils/noticeUtils";
 import { ref, type Ref } from "vue";
@@ -57,6 +57,28 @@ export const handlePageAcquisition = async (condition: FilesRequestConditions): 
         throw error;
     }
 };
+
+export const handleGetDetail = async (id: number): Promise<DetailFile | null> => {
+    console.log('execute: handleGetDetail()');
+    try {
+        const response = await axiosInstance.post('/api/file/getDetail',
+            { id }
+        )
+        const data = response.data.data
+        console.log("后端返回的信息码：", response.data.code)              //调试
+        console.log("后端返回的数据：", response.data.data)              //调试
+        console.log('handleGetDetail() execute completed');
+        if (data === null) {
+            return null;
+        }
+        return data;
+    } catch (error) {
+        // 取消上传失败，捕获异常
+        console.error('获取资源数据失败:', error)
+        throw error;
+    }
+    
+}
 
 export const updated = async (
     uploadProgress: Ref<string>,

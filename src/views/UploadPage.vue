@@ -8,6 +8,7 @@ import { handleGetFileCategories } from '@/requests/handleFileCategory';
 import { updated } from '@/requests/handleFile';
 import UploadProgress from '@/components/dialog/UploadProgress.vue';
 import { openErrorNotice, openSuccessNotice } from '@/utils/noticeUtils';
+import { parseText } from '@/utils/textParseCustomTags';
 
 
 const form = ref<FileInfoForm>({
@@ -145,6 +146,7 @@ async function submitForm() {
         })
 }
 
+
 function cancel() {
     //cancel upload
     start.value = false
@@ -212,7 +214,9 @@ onMounted(async () => {
 
                 <!-- 👇 这个详细介绍项单独占一整行 -->
                 <el-form-item class="full-width label-type" label="详细介绍" prop="introduce">
-                    <el-input type="textarea" v-model="form.introduce" :rows="6"></el-input>
+                    <el-input type="textarea" v-model="form.introduce" :rows="6"
+                        placeholder="换行请使用'\n'符号；设置小标题请使用'#小标题#'格式；设置突出显示请使用'@突出显示内容@'格式">
+                    </el-input>
                 </el-form-item>
             </el-form>
         </section>
@@ -231,11 +235,18 @@ onMounted(async () => {
                 <img width="100%" :src="dialogImageUrl" alt="预览图" />
             </el-dialog>
         </section>
-        <footer class="form-buttons" v-if="fileReady">
+        <section class="form-buttons" v-if="fileReady">
             <el-button type="danger" style="width: 100px;" @click="resetForm()" plain>重置</el-button>
             <el-button type="primary" style="width: 100px;" @click="submitForm()" plain>
                 提交
             </el-button>
+        </section>
+        <footer class="preview-en" v-if="fileReady">
+            <h2>效果预览</h2>
+            <br />
+            <h1 style="text-align: center">{{ form.headline }}</h1>
+            <div v-html="parseText(form.introduce)"></div>
+            <p class="notice">注意：预览效果可能受浏览器差异影响</p>
         </footer>
     </main>
     <UploadProgress v-if="start" :percentage="percentage" @cancel="cancel" @success="success">
@@ -244,14 +255,8 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-main {
-    padding: 50px;
-    margin: 0 auto;
-    min-height: calc(100vh - 150px);
-}
 
 header {
-
     text-align: center;
     margin-bottom: 2rem;
 }
@@ -319,10 +324,59 @@ header h1 {
 
 .form-buttons {
     padding: 20px;
-    width: 100%;
+    
     display: flex;
     justify-content: center;
     gap: 80px;
     margin: 0 auto;
+}
+
+.preview-en {
+    background-color: rgb(255, 255, 255);
+    max-width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    border: 1px solid rgb(204, 204, 204);
+}
+
+.preview-en h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.preview-en h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    word-break: break-word;
+}
+
+.preview-en div {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    max-width: 100%;
+}
+
+.preview-en div h2 {
+    margin: 15px 0 10px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #ccc;
+    word-break: break-word;
+}
+
+.preview-en div span[style*="color:red"] {
+    background: #ffeaa7;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+.notice {
+    margin-top: 80px;
+    text-align: center;
+    color: #909399;
+    font-size: 14px;
 }
 </style>
