@@ -65,7 +65,7 @@ export interface DetailFile extends FileListItem {
     uploader: string
     filePath: string
     introduce: string
-    imgs: string[]
+    imgsBase64: string[]
 }
 
 export interface Category {

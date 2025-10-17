@@ -4,7 +4,8 @@ const syntaxRules = [
   { regex: /\n/g, replace: '<br>' }
 ];
 
-export function parseText(text: string) {
+export function parseText(text: string | null | undefined) {
+  if (!text) return '';
   let result = text
   syntaxRules.forEach(rule => {
     result = result.replace(rule.regex, rule.replace)

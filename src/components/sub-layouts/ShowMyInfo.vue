@@ -1,5 +1,6 @@
 <script setup lang="ts">
 
+import '@/css/text.css'
 import { useLoginStore } from '@/stores/loginStore';
 import type { UserInfoResponseData } from '@/types';
 import { ref, watch } from 'vue';
@@ -49,7 +50,6 @@ function getSex(sex: string | undefined) {
         <dd>
           <el-avatar shape="square" :size="100" fit="cover" :src="avatarBase64"></el-avatar>
           <router-link to="/individual/update-avatar" style="color: cadetblue;">点击更换</router-link>
-
         </dd>
         <dt>用户名</dt>
         <dd>{{ props.personalInfo?.name }}</dd>
@@ -111,26 +111,6 @@ section h2 {
   margin: 0 0 1rem 0;
 }
 
-dl {
-  display: grid;
-  grid-template-columns: 100px 1fr;
-  gap: 0.75rem;
-  margin: 0;
-}
-
-dt {
-  font-weight: 600;
-  color: #7f8c8d;
-  text-align: right;
-  padding: 0.5rem 0;
-}
-
-dd {
-  margin: 0;
-  padding: 0.5rem 0;
-  color: #2c3e50;
-  word-break: break-word;
-}
 
 .buttons-section {
   display: flex;
@@ -156,21 +136,6 @@ button {
     padding: 1rem;
   }
 
-  dl {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-
-  dt {
-    text-align: left;
-    padding-bottom: 0.25rem;
-  }
-
-  dd {
-    padding-top: 0.25rem;
-    padding-bottom: 0.75rem;
-  }
-
   .buttons-section {
     flex-direction: column;
     align-items: stretch;
@@ -181,10 +146,4 @@ button {
   }
 }
 
-/* 空数据样式 */
-dd:empty::before {
-  content: "暂无信息";
-  color: #bdc3c7;
-  font-style: italic;
-}
 </style>
