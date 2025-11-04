@@ -2,14 +2,14 @@
 
 import { onMounted, reactive, ref, watch } from 'vue';
 import { Loading } from '@element-plus/icons-vue'
-import type { Category, FileListItem, FilePage, FilesRequestConditions, FilterFilesConditions } from '@/types';
+import type { Category, FileListItem, MyPage, FilesRequestConditions, FilterFilesConditions } from '@/types';
 import { handleIsSearch, handlePageAcquisition } from '@/requests/handleFile';
 import { handleGetFileCategories } from '@/requests/handleFileCategory';
 
 
 const version = ref(0)
 const currentPage = ref(1)
-const fp = ref<FilePage | null>(null)  // 文件列表
+const fp = ref<MyPage | null>(null)  // 文件列表
 // 创建响应式的筛选条件
 const filters = reactive<FilterFilesConditions>({
     searchTerm: '',
@@ -23,10 +23,10 @@ const fileCategory = ref<Category[]>([])
 
 // 使用LRU队列限制缓存页数（最大缓存10页）
 const MAX_CACHE_PAGES = 10
-const searchCache = ref<Map<number, FilePage>>(new Map())
-const normalCache = ref<Map<number, FilePage>>(new Map())
+const searchCache = ref<Map<number, MyPage>>(new Map())
+const normalCache = ref<Map<number, MyPage>>(new Map())
 // 更新LRU缓存
-function updateLRUCache(cache: Map<number, FilePage>, pageIndex: number, data: FilePage) {
+function updateLRUCache(cache: Map<number, MyPage>, pageIndex: number, data: MyPage) {
     // 如果缓存已满，移除最久未使用的项
     if (cache.size > MAX_CACHE_PAGES) {
         const firstKey = cache.keys().next().value
@@ -44,10 +44,11 @@ async function submitSearch(needPage: number) {
     ready.value = false
     window.scrollTo({ top: 0, behavior: 'instant' })
     console.log('搜索条件:', filters)
-    const currentCache = handleIsSearch(filters) ? searchCache.value : normalCache.value
-    //测试部分
     const isFilter: boolean = handleIsSearch(filters)
-    if (handleIsSearch(filters)) {
+    const currentCache = isFilter ? searchCache.value : normalCache.value
+    //测试部分
+
+    if (isFilter) {
         console.log('这是一个搜索请求')
     } else {
         console.log('这不是一个搜索请求')
@@ -153,9 +154,7 @@ onMounted(async () => {
         <!-- 展示区 -->
         <div v-if="ready" class="table-container">
             <div v-if="fp && fp.results && fp.results.length">
-                <el-table :data="fp.results" 
-                stripe style="width: 90%; margin: 0 auto; cursor: pointer;"
-                    @row-click="goToFile">
+                <el-table :data="fp.results" style="width: 90%; margin: 0 auto; cursor: pointer;" @row-click="goToFile">
                     <el-table-column prop="headline" label="标题" min-width="15%">
                     </el-table-column>
                     <el-table-column prop="category" label="类型" min-width="10%">

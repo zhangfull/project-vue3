@@ -85,7 +85,7 @@ export const handleInitializeLogin = async (): Promise<boolean> => {
             const data: LoginResponseData = response.data.data
             await useLoginStore().setUser(data)
         } else {
-            openErrorNotice(response.data.message)
+            openErrorNotice('登陆失效')
         }
         console.log('handleRegister() execute completed');
         return success

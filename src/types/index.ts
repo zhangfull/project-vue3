@@ -36,12 +36,12 @@ export interface FilesRequestConditions {
 
 export interface FilterFilesConditions {
     searchTerm: string | null
-    categoryCode: number | 0
+    categoryCode: number | null  // 
     dateRange?: 'last24Hours' | 'last7Days' | 'last30Days' | 'last90Days' | '' | null
     order: 'uploadDateDesc' | 'uploadDateAsc' | 'collectionCountDesc' | 'collectionCountAsc' | '' | null
 }
 
-export interface FilePage {
+export interface MyPage {
     currentPage: number
     totalPages: number
     latestVersion: number
@@ -65,7 +65,7 @@ export interface DetailFile extends FileListItem {
     uploader: string
     filePath: string
     introduce: string
-    imgsBase64: string[]
+    imgs: string[]
 }
 
 export interface Category {
@@ -91,10 +91,21 @@ export interface UploadPaths {
     imgsPath: string
 }
 
-export interface ValidateForm  {
+export interface ValidateForm {
     id: number,
     filePath: string,
     imgsPath: string,
     totalNumber: number,
     totalImgs: number
+}
+
+export interface ChartData {
+    name: string,
+    value: number
+}
+
+export interface UploaderListItem {
+    date: string,
+    fileId: number,
+    text: string
 }

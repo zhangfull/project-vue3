@@ -1,6 +1,6 @@
 // stores/user.ts
 
-import { handleGetAvatar } from "@/requests/handleImg"
+import { handleGetImg } from "@/requests/handleImg"
 import { handleInitializeLogin, handleRefreshLogin } from "@/requests/handleLogin"
 import type { LoginResponseData } from "@/types"
 import { openErrorNotice } from "@/utils/noticeUtils"
@@ -23,10 +23,10 @@ export const useLoginStore = defineStore('user', {
         async setUser(userInfo: LoginResponseData) {
             localStorage.setItem('accessToken', userInfo.accessToken)
             this.avatarUrl = userInfo.avatarUrl
-            this.avatarBase64 = await handleGetAvatar(this.avatarUrl)
+            this.avatarBase64 = await handleGetImg(this.avatarUrl)
         },
         async refreshAvatarBase64() {
-            this.avatarBase64 = await handleGetAvatar(this.avatarUrl)
+            this.avatarBase64 = await handleGetImg(this.avatarUrl)
         },
 
         logout() {
@@ -51,7 +51,7 @@ export const useLoginStore = defineStore('user', {
                     openErrorNotice('登陆信息过期，请重新登陆')
                 }
             }
-            return 
+            return
         }
     }
 })

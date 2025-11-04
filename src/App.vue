@@ -13,7 +13,7 @@ onMounted(async () => {
   timer = window.setInterval(() => {
     console.log("刷新登录认证", new Date().toLocaleTimeString())
     loginStore.refreshLogin()
-  }, 1000 * 60 * 8)
+  }, 1000 * 60 * 9)
 })
 
 onUnmounted(() => {

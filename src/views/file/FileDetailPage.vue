@@ -4,6 +4,7 @@ import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { parseText } from '@/utils/textParseCustomTags';
 import { handleGetDetail } from '@/requests/handleFile';
+import { handleGetImg } from '@/requests/handleImg';
 import '@/css/text.css';
 
 const route = useRoute();
@@ -11,10 +12,18 @@ const id = Number(route.params.id);
 const fileDetail = ref<DetailFile | null>(null);
 
 const goBack = () => window.close();
+const imgsBase64 = ref<string[]>([]);
 
 onMounted(async () => {
   fileDetail.value = await handleGetDetail(id);
+  if (fileDetail.value?.imgs?.length) {
+    const promises = fileDetail.value.imgs
+      .filter(Boolean)
+      .map(img => handleGetImg(img!));
+    imgsBase64.value = await Promise.all(promises);
+  }
 });
+
 </script>
 <template>
   <main>
@@ -35,8 +44,10 @@ onMounted(async () => {
           <dt>上传日期</dt>
           <dd>{{ fileDetail?.uploadDate }}</dd>
           <dt>上传者</dt>
-          <dd>{{ fileDetail?.uploader }}</dd>
-        </dl>
+          <dd>
+            <a style="color: inherit;" :href="'#'">{{ fileDetail?.uploader }}</a>
+          </dd>
+         </dl>
       </div>
     </section>
 
@@ -44,8 +55,9 @@ onMounted(async () => {
       <div v-html="parseText(fileDetail.introduce)" />
     </section>
 
-    <section class="images-section" v-if="fileDetail?.imgsBase64?.length">
-      <el-image v-for="(value, index) in fileDetail.imgsBase64" :key="index" :src="value" class="content-image" />
+    <section class="images-section" v-if="fileDetail?.imgs?.length">
+      <el-image v-for="(value, index) in imgsBase64" :key="index" :src="value" class="content-image" />
+
     </section>
   </main>
 </template>

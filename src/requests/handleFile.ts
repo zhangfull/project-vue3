@@ -1,4 +1,4 @@
-import { type DetailFile, type FileInfoForm, type FileListItem, type FilePage, type FilesRequestConditions, type FilterFilesConditions, type UploadPaths, type ValidateForm } from "@/types";
+import { type DetailFile, type FileInfoForm, type FileListItem, type MyPage, type FilesRequestConditions, type FilterFilesConditions, type UploadPaths, type ValidateForm } from "@/types";
 import axiosInstance from "./axiosInstance";
 import { createLoading, openErrorNotice } from "@/utils/noticeUtils";
 import { ref, type Ref } from "vue";
@@ -6,13 +6,26 @@ import { uploadFileImgs } from "./handleImg";
 
 // 判断是否为搜索
 export const handleIsSearch = (condition: FilterFilesConditions): boolean => {
-    return (condition.searchTerm !== null && condition.searchTerm !== '') ||
-        (condition.categoryCode !== null && condition.categoryCode !== 0) ||
-        (condition.dateRange !== null && condition.dateRange !== '') ||
-        (condition.order !== null && condition.order !== '');
+
+    if (condition.searchTerm !== null && condition.searchTerm !== '') {
+        return true;
+    }
+
+    if (condition.categoryCode !== null && Number(condition.categoryCode) !== 0) {
+        return true;
+    }
+
+    if (condition.dateRange !== null && condition.dateRange !== '') {
+        return true;
+    }
+
+    if (condition.order !== null && condition.order !== '') {
+        return true;
+    }
+    return false
 };
 
-export const handlePageAcquisition = async (condition: FilesRequestConditions): Promise<FilePage | null> => {
+export const handlePageAcquisition = async (condition: FilesRequestConditions): Promise<MyPage | null> => {
     console.log('execute: handlePageAcquisition()');
     if (condition.needPage < 1) {
         throw new Error('页码必须大于0');
@@ -25,7 +38,7 @@ export const handlePageAcquisition = async (condition: FilesRequestConditions): 
         console.log("设置过滤条件", condition.filters);
     }
     try {
-        const fp: FilePage = {
+        const fp: MyPage = {
             currentPage: 0,
             totalPages: 0,
             pageSize: 0,
@@ -77,7 +90,7 @@ export const handleGetDetail = async (id: number): Promise<DetailFile | null> =>
         console.error('获取资源数据失败:', error)
         throw error;
     }
-    
+
 }
 
 export const updated = async (
@@ -157,7 +170,7 @@ export const updated = async (
             currentChunkIndex += 1
         }
     }
-    
+
 
     // third step upload imgs
     if (imgs !== null) {

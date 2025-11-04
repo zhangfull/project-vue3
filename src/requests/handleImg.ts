@@ -1,15 +1,15 @@
 import { openErrorNotice, openSuccessNotice } from "@/utils/noticeUtils";
 import axiosInstance from "./axiosInstance";
 
-export const handleGetAvatar = async (url: string): Promise<string> => {
-    console.log(`execute: handleGetAvatar( ${url} )`);
+export const handleGetImg = async (url: string): Promise<string> => {
+    console.log(`execute: handleGetImg( ${url} )`);
 
     try {
         const response = await axiosInstance.post('/api/user/getAvatarBase64',
             { url }
         )
         console.log("后端返回的信息码：", response.data.code)              //调试
-        console.log('handleGetAvatar() execute completed');
+        console.log('handleGetImg() execute completed');
 
         if (response.data.code === 0) {
             return response.data.data
